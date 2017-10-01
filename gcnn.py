@@ -9,27 +9,35 @@ class GcnNet(object):
 		self.layers.append(layer)
 		return self.layers[-1]
 
-	def buildNet(self, node_count):
-		layer1 = self.addLayer(
-			node_count, 
+	def buildNet(self, node_count, adj_mat):
+		layer = GcnLayer(
+			node_count = node_count, 
+			adj_mat = adj_mat,
 			input_feature_count = 1,
 			output_feature_count = 2,
 			input_mat = None,
 			is_input = True)
 
-		layer2 = self.addLayer(
-			node_count,
+
+		layer1 = self.addLayer(layer)
+
+		layer = GcnLayer(
+			node_count = node_count,
+			adj_mat = adj_mat,
 			input_feature_count = 2,
 			output_feature_count = 1,
 			input_mat = layer1,
 			is_input = False)
+		layer2 = self.addLayer(layer)
+
 		self.logits = tf.reduce_mean(layer2)
 		return self.logits
 
-def GcnLayer(object):
+class GcnLayer(object):
 	def __init__(
 		self,
 		node_count, 
+		adj_mat,
 		input_feature_count, 
 		output_feature_count, 
 		input_mat = None,
