@@ -78,7 +78,7 @@ class IsrcParser(TwoNodesElem):
 		self.connection_idx = connection_type_idx['i_i']
 
 
-def getnodeparser(elemname, connection_type_idx):
+def getnodesparser(elemname, connection_type_idx):
 	elemtype = elemname.split('.')[-1][0].lower()
 	if elemtype == 'm':
 		return MosParser(connection_type_idx)

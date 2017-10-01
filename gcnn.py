@@ -1,7 +1,7 @@
 import tensorflow as tf 
 import numpy as np 
 
-def GcnNet(object):
+class GcnNet(object):
 	def __init__(self):
 		self.layers = []
 
@@ -9,7 +9,7 @@ def GcnNet(object):
 		self.layers.append(layer)
 		return self.layers[-1]
 
-	def buildNet(self,):
+	def buildNet(self, node_count):
 		layer1 = self.addLayer(
 			node_count, 
 			input_feature_count = 1,
@@ -23,7 +23,8 @@ def GcnNet(object):
 			output_feature_count = 1,
 			input_mat = layer1,
 			is_input = False)
-
+		self.logits = tf.reduce_mean(layer2)
+		return self.logits
 
 def GcnLayer(object):
 	def __init__(

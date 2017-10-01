@@ -46,4 +46,4 @@ class AdjTypeMat(object):
 		self.mat = np.zeros((nodes_count, self.connectionTypeCount, nodes_count))
 		for elem, nodes in self.elem_nodes.items():
 			elem_node_parser = getnodesparser(elem)
-			elem_node_parser->updateMat(self.mat, self.nodes_list, elem, nodes)
+			elem_node_parser.updateMat(self.mat, self.nodes_list, elem, nodes)
