@@ -5,11 +5,24 @@ def GcnNet(object):
 	def __init__(self):
 		self.layers = []
 
-	def addLayer(layer):
+	def addLayer(self, layer):
 		self.layers.append(layer)
+		return self.layers[-1]
 
-	def buildNet():
-		pass
+	def buildNet(self,):
+		layer1 = self.addLayer(
+			node_count, 
+			input_feature_count = 1,
+			output_feature_count = 2,
+			input_mat = None,
+			is_input = True)
+
+		layer2 = self.addLayer(
+			node_count,
+			input_feature_count = 2,
+			output_feature_count = 1,
+			input_mat = layer1,
+			is_input = False)
 
 
 def GcnLayer(object):
@@ -33,13 +46,13 @@ def GcnLayer(object):
 		[output_feature_count, node_count]
 		'''
 		if is_input:
-			self.weights = tf.Variable(tf.truncated_normal([output_feature_count, 1]))
-		else:
-			self.weights = tf.Variable(tf.truncated_normal(
-				[output_feature_count, input_feature_count]))
+			assert input_feature_count == 1, 'input should have feature count 1'
+		self.weights = tf.Variable(tf.truncated_normal(
+			[output_feature_count, input_feature_count]))
 		self.input_mat = input_mat
 		self.adj_mat = adj_mat # no changed for one instance
-		self.connect_type_mat = connect_type_count
+		self.connect_type_mat = tf.Variable(
+			tf.truncated_normal([connect_type_count, 1]))
 
 		output_by_central = []
 		for central_node in range(adj_mat.shape[0]):
