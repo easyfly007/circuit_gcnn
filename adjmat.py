@@ -1,7 +1,6 @@
 import numpy as np 
 from elemparser import getnodesparser
 
-
 class AdjTypeMat(object):
 	def __init__(self):
 		self.connectionTypeCount = 11
@@ -12,18 +11,16 @@ class AdjTypeMat(object):
 		elem2: n1 n5
 
 		'''
-		self.elem_node = dict()
+		self.elem_nodes = dict()
 		nodes_set = set()
 		with open(filename, 'r') as f:
 			lines = f.readlines()
 			for line in lines:
 				elem, *nodes = line.strip().split('')
-				self.elem_node[elem[:-1]] = nodes # element name end with :
+				self.elem_nodes[elem[:-1]] = nodes # element name end with :
 				nodes_set |= set(nodes_set)
 		self.nodes_list = sorted(list(nodes_set)) 
 		# make sure the order will not changed run under different python version, as hash map not gaurantee
-
-
 
 	def buildAdjTypeMat(self, filename):
 		''' 
@@ -45,14 +42,8 @@ class AdjTypeMat(object):
 		                       4
 		'''
 
-
-		self.mat = np.zeros((len(self.nodes_list),  len(self.nodes_list)))
+		nodes_count = len(self.nodes_list)
+		self.mat = np.zeros((nodes_count, self.connectionTypeCount, nodes_count))
 		for elem, nodes in self.elem_nodes.items():
 			elem_node_parser = getnodesparser(elem)
 			elem_node_parser->updateMat(self.mat, self.nodes_list, elem, nodes)
-
-	def buildAdjNodesMat(self):
-		# build [node_count, [node_count, nodetype_one_hot]]
-		nodesMat = np.zeros((len(self.nodes_list), len(self.nodes_list), self.connectionTypeCount))
-		for i in range(self.connectionTypeCount):
-			nodesMat[i][:, self.mat[i]] = 1
