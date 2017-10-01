@@ -22,7 +22,7 @@ class AdjTypeMat(object):
 		self.nodes_list = sorted(list(nodes_set)) 
 		# make sure the order will not changed run under different python version, as hash map not gaurantee
 
-	def buildAdjTypeMat(self, filename):
+	def buildAdjTypeMat(self):
 		''' 
 		suppose we have 
 		nodecount: 6, connection type count: 4
@@ -47,3 +47,4 @@ class AdjTypeMat(object):
 		for elem, nodes in self.elem_nodes.items():
 			elem_node_parser = getnodesparser(elem)
 			elem_node_parser.updateMat(self.mat, self.nodes_list, elem, nodes)
+		return self.mat
