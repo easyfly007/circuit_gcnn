@@ -1,6 +1,7 @@
 import numpy as np 
 from elemparser import getnodesparser
 
+
 class AdjTypeMat(object):
 	def __init__(self):
 		self.connectionTypeCount = 11
