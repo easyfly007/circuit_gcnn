@@ -45,16 +45,58 @@ class AdjTypeMat(object):
 		build adjacent matrix for each connection types
 		build 4 adj mat, which are all [6, 6] size
 		'''
-		# nodes_count = len(self.nodes_list)
-		# self.mat = np.zeros((nodes_count, self.connectionTypeCount, nodes_count))
-		# for elem, nodes in self.elem_nodes.items():
-		# 	elem_node_parser = getnodesparser(elem)
-		# 	elem_node_parser.updateMat(self.mat, self.nodes_list, nodes)
-		# return self.mat, nodes_count
 		nodes_count = len(self.nodes_list)
 		self.mat = np.zeros(
-			(self.connectionTypeCount, nodes_count, nodes_count), 
-			np.float)
+			(self.connectionTypeCount, nodes_count, nodes_count), np.float)
+		
+		''' suppose we have 4 different connection types, 6 nodes, 5 different input features, 3 output feature 
+		adj mat will be [6, 6*4]
+
+        1. build adjacent matrix[6, 6] for each connection type 4:
+		 _ _ _ _ _ _   _ _ _ _ _ _   _ _ _ _ _ _   _ _ _ _ _ _
+		|           | |           | |           | |           |
+		|  AdjMat 1 | |  AdjMat 2 | |  AdjMat 3 | |  AdjMat 4 |
+		|           | |           | |           | |           |
+		|           | |           | |           | |           |
+		|           | |           | |           | |           |
+		|_ _ _ _ _ _| |_ _ _ _ _ _| |_ _ _ _ _ _| |_ _ _ _ _ _| 
+
+		2. multipy each adj matrix ([6, 6]) with input matrix ([6, 5])
+		 _ _ _ _ _   _ _ _ _ _   _ _ _ _ _   _ _ _ _ _ 
+		|         | |         | |         | |         |
+		|         | |         | |         | |         |
+		|         | |         | |         | |         |
+		|         | |         | |         | |         |
+		|         | |         | |         | |         |
+		|_ _ _ _ _| |_ _ _ _ _| |_ _ _ _ _| |_ _ _ _ _|
+       
+		3. concate the result [6,5] matrix, we get [6, 20]
+		4. using the [6, 20] to multiply weights matrix [20, 3]
+		we got the final output [6, 3]
+		 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _       _ _ _     _ _ _ 
+		|         |         |         |         |     |     |   |     |
+		|         | AdjMat 2| AdjMat 3| AdjMat 4|     |     |   |     |
+		|         | type 2  | type 3  | type 4  | *   |     | = |     |
+		|         | [6, 6]  | [6, 6]  | [6, 6]  |     |     |   |     |
+		|         |         |         |         |     |     |   |     |
+		|_ _ _ _ _|_ _ _ _ _|_ _ _ _ _|_ _ _ _ _|     |     |   |_ _ _|
+                                                      |     |
+                                                      |     |
+                                                      |     |
+                                                      |     |
+                                                      |     |
+                                                      |     |
+                                                      |     |
+                                                      |     |
+                                                      |     |
+                                                      |     |
+                                                      |     |
+                                                      |     |
+                                                      |     |
+                                                      |     |
+                                                      |_ _ _|
+		 
+		'''
 		for elem, nodes in self.elem_nodes.items():
 			elem_node_parser = getnodesparser(elem)
 			elem_node_parser.updateMat(self.mat, self.nodes_list, nodes)
