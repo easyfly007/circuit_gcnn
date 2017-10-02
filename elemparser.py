@@ -1,11 +1,5 @@
-
-connection_idx2name = {}
-connection_name2idx = {}
-
-
 def buildConnectionMapping():
-	if len(connection_idx2name) > 0:
-		return
+	connection_idx2name = {}
 	connection_name2idx = {
 	'self': 0,
 	'md_mg': 1,
@@ -21,14 +15,16 @@ def buildConnectionMapping():
 	'i_i':11}
 	for name, idx in connection_name2idx.items():
 		connection_idx2name[idx] = name
-buildConnectionMapping()
+	return connection_name2idx, connection_idx2name
+
+connection_name2idx, connection_idx2name = buildConnectionMapping()
 
 class Base(object):
 	pass
 
 class TwoNodesElem(Base):
 	def updateMat(self, mat, total_nodes, elem_nodes):
-		assert len(nodes) == 2, self.elemtype + ' must have 2 nodes!'
+		assert len(elem_nodes) == 2, self.elemtype + ' must have 2 nodes!'
 		n1, n2 = elem_nodes
 		if n1 == n2:
 			return
