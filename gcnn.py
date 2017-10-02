@@ -21,6 +21,8 @@ class GcnNet(object):
 
 		layer1 = self.addLayer(layer)
 
+		# need to add activation layer here
+
 		layer = GcnLayer(
 			node_count = node_count,
 			adj_mat = adj_mat,
@@ -33,6 +35,31 @@ class GcnNet(object):
 		self.logits = tf.reduce_mean(layer2)
 		return self.logits
 
+'''
+graph convolutional operation:
+suppose we have:
+graph_node_size = 6
+input_feature_size = 5
+output_feature_size = 3
+connection_type_size = 4
+
+the input tensor will be a [6,5] matrix
+the output tensor will be a [6, 3] matrix
+the weight Variable we need to learn: [4*5, 3]
+as for each output ndoe, the value will be each adjacent type node value * weight, and combine all the layer, type together
+
+then how to transfer the input [6,5] matrix to a suitable [6, 20]?
+we need the adj matrix by type
+
+as we have 4 types, we will build 4 [6, 6] adj matrix
+for each adj matrix [6, 6]
+do adj_mat * input_tensor,
+[6,6] * [6,5], then we get a [6,5], we have by layer by central node accumulated matrix, for one connection type
+
+we then concatenate these 4 [6, 5] matrix horizontally together,
+we have a [6, 5*4] matrix, this is the the input we need for multiply with the weights matrix
+using these [6, 20] *[20, 3], we get the output matrix [6, 3] 
+'''
 class GcnLayer(object):
 	def __init__(
 		self,
