@@ -10,12 +10,14 @@ class GcnNet(object):
 		return self.layers[-1]
 
 	def buildNet(self, node_count, adj_mat):
+		input_mat = tf.ones((node_count, 1))
+
 		layer = GcnLayer(
 			node_count = node_count, 
 			adj_mat = adj_mat,
 			input_feature_count = 1,
 			output_feature_count = 2,
-			input_mat = None,
+			input_mat = input_mat,
 			is_input = True)
 
 
@@ -83,21 +85,22 @@ class GcnLayer(object):
 		'''
 		if is_input:
 			assert input_feature_count == 1, 'input should have feature count 1'
+		
 		self.weights = tf.Variable(tf.truncated_normal(
-			[output_feature_count, input_feature_count]))
+			[input_feature_count *connect_type_count, output_feature_count]))
 		self.input_mat = input_mat
-		self.adj_mat = tf.reshape(adj_mat, (node_count, node_count,connect_type_count))
+		
+		self.adj_mat = adj_mat
 		print(adj_mat, self.adj_mat.shape)
-		self.connect_type_mat = tf.Variable(
-			tf.truncated_normal([connect_type_count, 1]))
+		
+		self.adj_mat = []
+		for i in range(connect_type_count):
+			self.adj_mat.append(tf.matmul(adj_mat[i], self.input_mat))
+		self.prepare_mat = tf.concat(self.adj_mat, axis = 1)
+		print(self.prepare_mat.shape.as_list())
 
-		output_by_central = []
-		for central_node in range(self.adj_mat.shape[0]):
-			output = tf.matmul(self.Weights, self.input_mat)
-			output = tf.matmul(output, self.adj_mat[central_node])
-			output = tf.matmul(output, self.connect_type_mat)
-			output = tf.reshape(output, shape = (-1,))
-			output_by_central.append(output)
-		self.output_mat = tf.stack(output_by_central, axis = 1)
+		output = tf.matmul(self.prepare_mat, self.weights)
+		print(output.shape.as_list())
+
 		# output_mat shape: [output_feature_count, node_count]
 		# input_mat shape: [input_feature_count, node_count] 

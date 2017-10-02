@@ -3,7 +3,7 @@ from elemparser import getnodesparser
 
 class AdjTypeMat(object):
 	def __init__(self):
-		self.connectionTypeCount = 11
+		self.connectionTypeCount = 12 # including self to self
 
 	def readin(self, filename):
 		''' read in netlist file, with format:
