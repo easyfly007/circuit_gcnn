@@ -7,8 +7,8 @@ def get_inputs_data():
 		for file in f.readlines():
 			file = file.strip()
 			adj_obj.readin(file)
-			adj_mat = adj_obj.buildAdjTypeMat()
-			features.append(adj_mat)
+			adj_mat, node_count = adj_obj.buildAdjTypeMat()
+			features.append((adj_mat, node_count))
 
 	labels = []
 	with open('labellist.txt', 'r') as f:

@@ -59,12 +59,13 @@ class GcnLayer(object):
 		self.weights = tf.Variable(tf.truncated_normal(
 			[output_feature_count, input_feature_count]))
 		self.input_mat = input_mat
-		self.adj_mat = adj_mat # no changed for one instance
+		self.adj_mat = tf.reshape(adj_mat, (node_count, node_count,connect_type_count))
+		print(adj_mat, self.adj_mat.shape)
 		self.connect_type_mat = tf.Variable(
 			tf.truncated_normal([connect_type_count, 1]))
 
 		output_by_central = []
-		for central_node in range(adj_mat.shape[0]):
+		for central_node in range(self.adj_mat.shape[0]):
 			output = tf.matmul(self.Weights, self.input_mat)
 			output = tf.matmul(output, self.adj_mat[central_node])
 			output = tf.matmul(output, self.connect_type_mat)
