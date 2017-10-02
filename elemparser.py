@@ -32,8 +32,8 @@ class TwoNodesElem(Base):
 		n2_idx = total_nodes.index(n2)
 		# mat is a 3 dimention matrix
 		# [central_node_idx] [connection_type] [adjacent_node_idx] 
-		mat[n1_idx][self.connection_idx][n2_idx] = 1
-		mat[n2_idx][self.connection_idx][n1_idx] = 1
+		mat[self.connection_idx][n1_idx][n2_idx] = 1
+		mat[self.connection_idx][n2_idx][n1_idx] = 1
 		
 
 class MosParser(Base):
@@ -43,12 +43,12 @@ class MosParser(Base):
 		d_idx = total_nodes.index(d)
 		g_idx = total_nodes.index(g)
 		s_idx = total_nodes.index(s)
-		mat[d_idx][connection_name2idx['md_mg']][g_idx] = 1
-		mat[d_idx][connection_name2idx['md_ms']][s_idx] = 1
-		mat[g_idx][connection_name2idx['mg_md']][d_idx] = 1
-		mat[g_idx][connection_name2idx['mg_ms']][s_idx] = 1
-		mat[s_idx][connection_name2idx['ms_md']][d_idx] = 1
-		mat[s_idx][connection_name2idx['ms_mg']][g_idx] = 1
+		mat[connection_name2idx['md_mg']][d_idx][g_idx] = 1
+		mat[connection_name2idx['md_ms']][d_idx][s_idx] = 1
+		mat[connection_name2idx['mg_md']][g_idx][d_idx] = 1
+		mat[connection_name2idx['mg_ms']][g_idx][s_idx] = 1
+		mat[connection_name2idx['ms_md']][s_idx][d_idx] = 1
+		mat[connection_name2idx['ms_mg']][s_idx][g_idx] = 1
 
 
 class ResParser(TwoNodesElem):

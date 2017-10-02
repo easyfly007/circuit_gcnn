@@ -41,10 +41,22 @@ class AdjTypeMat(object):
 		0   0   0   0       |_|_|_|_|
 		                       4
 		'''
-
+		'''
+		build adjacent matrix for each connection types
+		build 4 adj mat, which are all [6, 6] size
+		'''
+		# nodes_count = len(self.nodes_list)
+		# self.mat = np.zeros((nodes_count, self.connectionTypeCount, nodes_count))
+		# for elem, nodes in self.elem_nodes.items():
+		# 	elem_node_parser = getnodesparser(elem)
+		# 	elem_node_parser.updateMat(self.mat, self.nodes_list, nodes)
+		# return self.mat, nodes_count
 		nodes_count = len(self.nodes_list)
-		self.mat = np.zeros((nodes_count, self.connectionTypeCount, nodes_count))
+		self.mat = np.zeros(
+			(self.connectionTypeCount, nodes_count, nodes_count), 
+			np.float)
 		for elem, nodes in self.elem_nodes.items():
 			elem_node_parser = getnodesparser(elem)
 			elem_node_parser.updateMat(self.mat, self.nodes_list, nodes)
 		return self.mat, nodes_count
+
