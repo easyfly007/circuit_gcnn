@@ -3,7 +3,7 @@ import os
 from adjmat import AdjTypeMat
 
 def get_inputs_data():
-	if os.path.isfile('data.pkl', 'r'):
+	if os.path.isfile('data.pkl'):
 		with open('data.pkl', 'rb') as f:
 			pickle_data = pickle.load(f)
 			features, labels = pickle_data['features'], pickle_data['labels']
