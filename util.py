@@ -5,8 +5,9 @@ def get_inputs_data():
 	features = []
 	with open('caselist.txt', 'r') as f:
 		for file in f.readlines():
-			adj.readin(file)
-			adj_mat = adj.buildAdjTypeMat()
+			file = file.strip()
+			adj_obj.readin(file)
+			adj_mat = adj_obj.buildAdjTypeMat()
 			features.append(adj_mat)
 
 	labels = []

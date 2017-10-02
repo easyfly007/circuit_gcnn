@@ -16,9 +16,9 @@ class AdjTypeMat(object):
 		with open(filename, 'r') as f:
 			lines = f.readlines()
 			for line in lines:
-				elem, *nodes = line.strip().split('')
+				elem, *nodes = line.strip().split()
 				self.elem_nodes[elem[:-1]] = nodes # element name end with :
-				nodes_set |= set(nodes_set)
+				nodes_set |= set(nodes)
 		self.nodes_list = sorted(list(nodes_set)) 
 		# make sure the order will not changed run under different python version, as hash map not gaurantee
 
@@ -46,5 +46,7 @@ class AdjTypeMat(object):
 		self.mat = np.zeros((nodes_count, self.connectionTypeCount, nodes_count))
 		for elem, nodes in self.elem_nodes.items():
 			elem_node_parser = getnodesparser(elem)
-			elem_node_parser.updateMat(self.mat, self.nodes_list, elem, nodes)
+			elem_node_parser.updateMat(self.mat, self.nodes_list, nodes)
 		return self.mat
+
+		mat, total_nodes, elem_nodes

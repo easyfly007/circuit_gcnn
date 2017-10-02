@@ -2,6 +2,7 @@
 connection_idx2name = {}
 connection_name2idx = {}
 
+
 def buildConnectionMapping():
 	if len(connection_idx2name) > 0:
 		return
@@ -18,9 +19,9 @@ def buildConnectionMapping():
 	'l_l': 9,
 	'v_v':10,
 	'i_i':11}
-	for name, idx in connection_name2idx:
+	for name, idx in connection_name2idx.items():
 		connection_idx2name[idx] = name
-
+buildConnectionMapping()
 
 class Base(object):
 	pass
@@ -41,7 +42,7 @@ class TwoNodesElem(Base):
 
 class MosParser(Base):
 	def updateMat(self, mat, total_nodes, elem_nodes):
-		assert len(nodes) == 4, 'mosfet must have 4 nodes!'
+		assert len(elem_nodes) == 4, 'mosfet must have 4 nodes!'
 		d, g, s, _ = elem_nodes # nb not cnosidered
 		d_idx = total_nodes.index(d)
 		g_idx = total_nodes.index(g)
@@ -55,40 +56,40 @@ class MosParser(Base):
 
 
 class ResParser(TwoNodesElem):
-	def __init__(self, connection_type_idx):
+	def __init__(self):
 		self.elemtype = 'resistor'
-		self.connection_idx = connection_type_idx['r_r']
+		self.connection_idx = connection_name2idx['r_r']
 
 
 class CapParser(TwoNodesElem):
-	def __init__(self, connection_type_idx):
+	def __init__(self):
 		self.elemtype = 'capacitor'
-		self.connection_idx = connection_type_idx['c_c']
+		self.connection_idx = connection_name2idx['c_c']
 
 
 class VsrcParser(TwoNodesElem):
-	def __init__(self, connection_type_idx):
+	def __init__(self):
 		self.elemtype = 'voltage source '
-		self.connection_idx = connection_type_idx['v_v']
+		self.connection_idx = connection_name2idx['v_v']
 
 
 class IsrcParser(TwoNodesElem):
-	def __init__(self, connection_type_idx):
+	def __init__(self):
 		self.elemtype = 'current source '
-		self.connection_idx = connection_type_idx['i_i']
+		self.connection_idx = connection_name2idx['i_i']
 
 
-def getnodesparser(elemname, connection_type_idx):
+def getnodesparser(elemname):
 	elemtype = elemname.split('.')[-1][0].lower()
 	if elemtype == 'm':
-		return MosParser(connection_type_idx)
+		return MosParser()
 	elif elemtype == 'r':
-		return ResParser(connection_type_idx)
+		return ResParser()
 	elif elemtype == 'c':
-		return CapParser(connection_type_idx)
+		return CapParser(connection_name2idx)
 	elif elemtype == 'v':
-		return VsrcParser(connection_type_idx)
+		return VsrcParser()
 	elif elemtype == 'i':
-		return IsrcParser(connection_type_idx)
+		return IsrcParser()
 	else:
 		assert 0, 'element ' + elemname + ' currently not supported!'
