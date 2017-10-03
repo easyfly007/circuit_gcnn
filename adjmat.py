@@ -23,27 +23,9 @@ class AdjTypeMat(object):
 		# make sure the order will not changed run under different python version, as hash map not gaurantee
 
 	def buildAdjTypeMat(self):
-		''' 
-		suppose we have 
-		nodecount: 6, connection type count: 4
-
-		output:matrix with size (6, 4) *6
-		[central_node_idx] [connection_type] [adjacent_node_idx] ]
-		    ____________    
-		   /   /   /   /|     /_/_/_/_/
-		  /   /   /   / |    /_/_/_/_/ 6
-		 /   /   /   /  |   /_/_/_/_/
-		1   0   0   0   |   |_|_|_|_|  
-		0   0   1   0   |   |_|_|_|_|
-		0   0   0   0  /    |_|_|_|_| 6
-		0   0   0   1 /     |_|_|_|_|
-		0   1   0   0/      |_|_|_|_|
-		0   0   0   0       |_|_|_|_|
-		                       4
-		'''
 		'''
 		build adjacent matrix for each connection types
-		build 4 adj mat, which are all [6, 6] size
+		e.g., build 4 adj mat, which are all [6, 6] size ajd matrix
 		'''
 		nodes_count = len(self.nodes_list)
 		self.mat = np.zeros(
@@ -53,15 +35,16 @@ class AdjTypeMat(object):
 		adj mat will be [6, 6*4]
 
         1. build adjacent matrix[6, 6] for each connection type 4:
-		 _ _ _ _ _ _   _ _ _ _ _ _   _ _ _ _ _ _   _ _ _ _ _ _
-		|           | |           | |           | |           |
-		|  AdjMat 1 | |  AdjMat 2 | |  AdjMat 3 | |  AdjMat 4 |
-		|           | |           | |           | |           |
-		|           | |           | |           | |           |
-		|           | |           | |           | |           |
-		|_ _ _ _ _ _| |_ _ _ _ _ _| |_ _ _ _ _ _| |_ _ _ _ _ _| 
+		 _ _ _ _ _ _   _ _ _ _ _ _   _ _ _ _ _ _   _ _ _ _ _ _      _ _ _ _ _
+		|           | |           | |           | |           |    |         |
+		|  AdjMat 1 | |  AdjMat 2 | |  AdjMat 3 | |  AdjMat 4 |  * | Input   |
+		|  Type 1   | |  Type 2   | |  Type 3   | |  Type 4   |    | Matrix  |
+		|           | |           | |           | |           |    |         |
+		|           | |           | |           | |           |    |         |
+		|_ _ _ _ _ _| |_ _ _ _ _ _| |_ _ _ _ _ _| |_ _ _ _ _ _|    |_ _ _ _ _|
 
-		2. multipy each adj matrix ([6, 6]) with input matrix ([6, 5])
+		2. adj matix multiply with input matrix, for each connection type
+		   then get 4  ([6, 5]) matrix
 		 _ _ _ _ _   _ _ _ _ _   _ _ _ _ _   _ _ _ _ _ 
 		|         | |         | |         | |         |
 		|         | |         | |         | |         |
@@ -73,28 +56,30 @@ class AdjTypeMat(object):
 		3. concate the result [6,5] matrix, we get [6, 20]
 		4. using the [6, 20] to multiply weights matrix [20, 3]
 		we got the final output [6, 3]
-		 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _       _ _ _     _ _ _ 
-		|         |         |         |         |     |     |   |     |
-		|         | AdjMat 2| AdjMat 3| AdjMat 4|     |     |   |     |
-		|         | type 2  | type 3  | type 4  | *   |     | = |     |
-		|         | [6, 6]  | [6, 6]  | [6, 6]  |     |     |   |     |
-		|         |         |         |         |     |     |   |     |
-		|_ _ _ _ _|_ _ _ _ _|_ _ _ _ _|_ _ _ _ _|     |     |   |_ _ _|
-                                                      |     |
-                                                      |     |
-                                                      |     |
-                                                      |     |
-                                                      |     |
-                                                      |     |
-                                                      |     |
-                                                      |     |
-                                                      |     |
-                                                      |     |
-                                                      |     |
-                                                      |     |
-                                                      |     |
-                                                      |     |
-                                                      |_ _ _|
+
+		input for each node, by type by layer     *  Weights = Output
+		 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _      _ _ _     _ _ _ 
+		|         |         |         |         |    |     |   |     |
+		| AdjMat 1| AdjMat 2| AdjMat 3| AdjMat 4|    |     |   |     |
+		| type 1  | type 2  | type 3  | type 4  | *  |     | = |     |
+		| [6, 5]  | [6, 5]  | [6, 5]  | [6, 5]  |    |     |   |     |
+		|         |         |         |         |    |     |   |     |
+		|_ _ _ _ _|_ _ _ _ _|_ _ _ _ _|_ _ _ _ _|    |     |   |_ _ _|
+                                                     |     |
+                                                     |     |
+                                                     |     |
+                                                     |     |
+                                                     |     |
+                                                     |     |
+                                                     |     |
+                                                     |     |
+                                                     |     |
+                                                     |     |
+                                                     |     |
+                                                     |     |
+                                                     |     |
+                                                     |     |
+                                                     |_ _ _|
 		 
 		'''
 		for elem, nodes in self.elem_nodes.items():
