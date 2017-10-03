@@ -22,7 +22,9 @@ class GcnNet(object):
 
 
 		layer1 = self.addLayer(layer)
+		# print(layer1.shape.as_list())
 
+		# layer1 = tf.nn.relu(layer1)
 		# need to add activation layer here
 
 		# layer = GcnLayer(
@@ -72,7 +74,8 @@ class GcnLayer(object):
 		output_feature_count, 
 		input_mat = None,
 		connect_type_count = 11,
-		is_input = True,):
+		is_input = True,
+		activation = 'None'):
 		''' 
 		output = Weights * input_mat * adj_mat * connect_type_mat
 		weights:			[output_feature_count, input_feature_count]
@@ -107,6 +110,13 @@ class GcnLayer(object):
 		# print(self.prepare_mat.shape.as_list())
 
 		self.output = tf.matmul(self.prepare_mat, self.weights)
+		if activation.lower() == 'relu':
+			self.output = tf.nn.relu(self.output)
+		elif activation.lower() == 'tanh':
+			self.output = tf.tanh(self.output)
+		elif activation.lower() == 'sigmoid':
+			self.output = tf.sigmoid(self.output)
+
 		# print(output.shape.as_list())
 
 		# output_mat shape: [output_feature_count, node_count]

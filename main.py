@@ -37,13 +37,15 @@ optimizer = tf.train.AdamOptimizer(learning_rate = placeholder_learning_rate).mi
 # set super parameters
 epoches = 20
 learning_rate = 0.001
-epoch_print = 1
+epoch_print = 5
+verbose = True
 
 init = tf.global_variables_initializer()
 with tf.Session() as sess:
 	sess.run(init)
 	for epoch in range(epoches):
-		for feature, label in zip(features, labels):
+		total_accuracy = 0.0
+		for sample_idx, (feature, label) in enumerate(zip(features, labels)):
 			adj_mat, node_count = feature
 			feed = {
 				placeholder_learning_rate: learning_rate,
@@ -51,11 +53,16 @@ with tf.Session() as sess:
 				placeholder_node_count: node_count,
 				placeholder_label: label }
 			_, probability, accuracy = sess.run((optimizer, prob, accu), feed_dict = feed)
-			if epoch % epoch_print == 0:
-				print('\n')
-				print('epoch: ', epoch, ' label is:', label)
-				print('the prodicted probability is :', probability)
-				print('the accuracy is: ', accuracy)
+			total_accuracy += accuracy
+			if verbose and epoch % epoch_print == 0:
+				print('\n\tsample:', sample_idx, 'label is:', label)
+				print('\tthe predicted probability is:', probability)
+				print('\tthe accuracy is:', accuracy)
+		if epoch % epoch_print == 0:
+			total_accuracy /= len(features)
+			print('\nEpoch', epoch)
+			print('total accuracy is:', total_accuracy)
+			print('='*60)
 
 
 # 4. test
