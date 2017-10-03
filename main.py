@@ -40,6 +40,7 @@ verbose = True
 init = tf.global_variables_initializer()
 saver = tf.train.Saver()
 
+print('training begin...')
 with tf.Session() as sess:
 	sess.run(init)
 	for epoch in range(1, epoches+1):
@@ -67,6 +68,7 @@ with tf.Session() as sess:
 
 
 # 4. test
+print('testing begin')
 features_test, labels_test = get_inputs_data('test')
 with tf.Session() as sess:
 	saver.restore(sess, 'saved_models/gcn_model.ckpt')
@@ -88,3 +90,26 @@ with tf.Session() as sess:
 			print('\tthe accuracy is:', accuracy)
 	total_accuracy /= len(features_test)
 	print('total test accuracy is:', total_accuracy)
+
+
+#5 inference, which means no label provided
+print('inference begin...')
+label_file = 'infer_labellist.txt'
+features_infer, _ = get_inputs_data('infer')
+
+with open(label_file, 'w') as f:
+	with tf.Session() as sess:
+		saver.restore(sess, 'saved_models/gcn_model.ckpt')
+		print('reload model from \'saved_models/gcn_model.ckpt\'')
+
+		total_accuracy = 0.0
+		for sample_idx, feature in enumerate(features_infer):
+			adj_mat, node_count = feature
+
+			feed = {
+				placeholder_adj_mats: adj_mat, 
+				placeholder_node_count: node_count}
+			predicted = sess.run((pred), feed_dict = feed)
+			if verbose:
+				print('\n\tinference sample:', sample_idx, 'predicted:', predicted)
+			f.write(str(predicted) + '\n')

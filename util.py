@@ -3,9 +3,9 @@ import os
 from adjmat import AdjTypeMat
 
 def get_inputs_data(datatype):
-	assert datatype in ['train', 'test'], 'you must specify the data type, train or test'
+	assert datatype in ['train', 'test', 'infer'], 'you must specify the data type, train or test'
 
-	if os.path.isfile(datatype + '_data.pkl'):
+	if datatype in ['train', 'test'] and os.path.isfile(datatype + '_data.pkl'):
 		with open(datatype + '_data.pkl', 'rb') as f:
 			pickle_data = pickle.load(f)
 			features, labels = pickle_data['features'], pickle_data['labels']
@@ -20,20 +20,24 @@ def get_inputs_data(datatype):
 				adj_mat, node_count = adj_obj.buildAdjTypeMat()
 				features.append((adj_mat, node_count))
 
-		labels = []
-		with open(datatype + '_labellist.txt', 'r') as f:
-			for line in f.readlines():
-				line = line.strip()
-				if line == '1':
-					labels.append(1.0)
-				else:
-					labels.append(0.0)
+		if datatype in ['train', 'test']:
+			labels = []
+			with open(datatype + '_labellist.txt', 'r') as f:
+				for line in f.readlines():
+					line = line.strip()
+					if line == '1':
+						labels.append(1.0)
+					else:
+						labels.append(0.0)
 
-		with open(datatype + '_data.pkl', 'wb') as f:
-			pickle.dump({
-				'features': features,
-				'labels': labels},
-				f, pickle.HIGHEST_PROTOCOL)
+			with open(datatype + '_data.pkl', 'wb') as f:
+				pickle.dump({
+					'features': features,
+					'labels': labels},
+					f, pickle.HIGHEST_PROTOCOL)
+		elif datatype == 'infer':
+			labels = None
+			
 	return features, labels
 
 
