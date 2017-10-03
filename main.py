@@ -42,7 +42,7 @@ saver = tf.train.Saver()
 
 with tf.Session() as sess:
 	sess.run(init)
-	for epoch in range(epoches):
+	for epoch in range(1, epoches+1):
 		total_accuracy = 0.0
 		for sample_idx, (feature, label) in enumerate(zip(features_train, labels_train)):
 			adj_mat, node_count = feature
