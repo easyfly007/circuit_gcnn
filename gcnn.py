@@ -32,7 +32,16 @@ class GcnNet(object):
 			is_input = False)
 		layer2 = self.addLayer(layer)
 
-		logits = tf.squeeze(layer2.output, axis = 1)
+		layer = AttenLayer(
+			node_count = node_count, 
+			adj_mats = adj_mats, 
+			input_feature_count = 1,
+			input_mat = layer2.output)
+		layer3 = self.addLayer(layer)
+
+		layer4 = layer2.output * layer3.output
+		
+		logits = tf.squeeze(layer4, axis = 1)
 		self.logits = tf.reduce_mean(logits)
 		return self.logits
 
@@ -40,8 +49,8 @@ class GcnNet(object):
 graph convolutional operation:
 suppose we have:
 graph_node_size = 6
-input_feature_size = 5
-output_feature_size = 3
+input_feature_count = 5
+output_feature_count = 3
 connection_type_size = 4
 
 the input tensor will be a [6,5] matrix
@@ -67,9 +76,9 @@ class GcnLayer(object):
 		node_count, 
 		adj_mats,
 		input_feature_count, 
-		output_feature_count, 
+		output_feature_count = 1, 
 		input_mat = None,
-		connect_type_count = 11,
+		connect_type_count = 12,
 		is_input = True,
 		activation = 'None'):
 		''' 
@@ -91,19 +100,12 @@ class GcnLayer(object):
 			[input_feature_count *connect_type_count, output_feature_count]))
 		self.input_mat = input_mat
 		
-		# print(adj_mats.shape, adj_mats)
-
-
 		self.adj_mats = []
 		for i in range(connect_type_count):
 			adj_mat = tf.reshape(adj_mats[i], (node_count, node_count))
-			# print(i,'\n\n')
-			# print(adj_mat.shape)
 			a = tf.matmul(adj_mat, self.input_mat)
 			self.adj_mats.append(a)
-			# self.adj_mats.append(tf.matmul(adj_mat, self.input_mat))
 		self.prepare_mat = tf.concat(self.adj_mats, axis = 1)
-		# print(self.prepare_mat.shape.as_list())
 
 		self.output = tf.matmul(self.prepare_mat, self.weights)
 		if activation.lower() == 'relu':
@@ -112,8 +114,29 @@ class GcnLayer(object):
 			self.output = tf.tanh(self.output)
 		elif activation.lower() == 'sigmoid':
 			self.output = tf.sigmoid(self.output)
+		elif activation.lower() == 'softmax':
+			self.output = tf.nn.softmax(self.output)
+		else:
+			pass
 
-		# print(output.shape.as_list())
 
-		# output_mat shape: [output_feature_count, node_count]
-		# input_mat shape: [input_feature_count, node_count] 
+# attention layer is the special condition for GcnLayer
+# while the output_feature_count must be 1, and activation function should be softmax 
+class AttenLayer(GcnLayer):
+	def __init__(
+		self,
+		node_count, 
+		adj_mats,
+		input_feature_count, 
+		input_mat,
+		connect_type_count = 12,
+		is_input = True,
+		):
+		super(AttenLayer, self).__init__(
+			node_count = node_count,
+			adj_mats = adj_mats,
+			input_feature_count = input_feature_count,
+			output_feature_count = 1,
+			input_mat = input_mat,
+			connect_type_count = connect_type_count,
+			activation = 'softmax')
