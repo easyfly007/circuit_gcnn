@@ -21,14 +21,17 @@ def get_inputs_data():
 		with open('labellist.txt', 'r') as f:
 			for line in f.readlines():
 				if line == '1':
-					labels.append(1)
+					labels.append(1.0)
 				else:
-					labels.append(0)
+					labels.append(0.0)
 
 		with open('dump.pkl', 'wb') as f:
 			pickle.dump({
 				'features': features,
 				'labels': labels},
 				f, pickle.HIGHEST_PROTOCOL)
-
+	print(type(labels[0]))
 	return features, labels
+
+if __name__ == '__main__':
+	features, labels = get_inputs_data()

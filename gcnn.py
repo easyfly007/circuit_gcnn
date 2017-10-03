@@ -9,14 +9,14 @@ class GcnNet(object):
 		self.layers.append(layer)
 		return self.layers[-1]
 
-	def buildNet(self, node_count, adj_mat):
+	def buildNet(self, node_count, adj_mats):
 		input_mat = tf.ones((node_count, 1))
 
 		layer = GcnLayer(
 			node_count = node_count, 
-			adj_mat = adj_mat,
+			adj_mats = adj_mats,
 			input_feature_count = 1,
-			output_feature_count = 2,
+			output_feature_count = 1,
 			input_mat = input_mat,
 			is_input = True)
 
@@ -25,16 +25,17 @@ class GcnNet(object):
 
 		# need to add activation layer here
 
-		layer = GcnLayer(
-			node_count = node_count,
-			adj_mat = adj_mat,
-			input_feature_count = 2,
-			output_feature_count = 1,
-			input_mat = layer1,
-			is_input = False)
-		layer2 = self.addLayer(layer)
+		# layer = GcnLayer(
+		# 	node_count = node_count,
+		# 	adj_mats = adj_mats,
+		# 	input_feature_count = 2,
+		# 	output_feature_count = 1,
+		# 	input_mat = layer1,
+		# 	is_input = False)
+		# layer2 = self.addLayer(layer)
 
-		self.logits = tf.reduce_mean(layer2)
+		logits = tf.squeeze(layer1.output, axis = 1)
+		self.logits = tf.reduce_mean(logits)
 		return self.logits
 
 '''
@@ -66,7 +67,7 @@ class GcnLayer(object):
 	def __init__(
 		self,
 		node_count, 
-		adj_mat,
+		adj_mats,
 		input_feature_count, 
 		output_feature_count, 
 		input_mat = None,
@@ -83,6 +84,7 @@ class GcnLayer(object):
 		do a for loop for the node_count in adj_mat, and then output will be
 		[output_feature_count, node_count]
 		'''
+
 		if is_input:
 			assert input_feature_count == 1, 'input should have feature count 1'
 		
@@ -90,17 +92,22 @@ class GcnLayer(object):
 			[input_feature_count *connect_type_count, output_feature_count]))
 		self.input_mat = input_mat
 		
-		self.adj_mat = adj_mat
-		print(adj_mat, self.adj_mat.shape)
-		
-		self.adj_mat = []
-		for i in range(connect_type_count):
-			self.adj_mat.append(tf.matmul(adj_mat[i], self.input_mat))
-		self.prepare_mat = tf.concat(self.adj_mat, axis = 1)
-		print(self.prepare_mat.shape.as_list())
+		# print(adj_mats.shape, adj_mats)
 
-		output = tf.matmul(self.prepare_mat, self.weights)
-		print(output.shape.as_list())
+
+		self.adj_mats = []
+		for i in range(connect_type_count):
+			adj_mat = tf.reshape(adj_mats[i], (node_count, node_count))
+			# print(i,'\n\n')
+			# print(adj_mat.shape)
+			a = tf.matmul(adj_mat, self.input_mat)
+			self.adj_mats.append(a)
+			# self.adj_mats.append(tf.matmul(adj_mat, self.input_mat))
+		self.prepare_mat = tf.concat(self.adj_mats, axis = 1)
+		# print(self.prepare_mat.shape.as_list())
+
+		self.output = tf.matmul(self.prepare_mat, self.weights)
+		# print(output.shape.as_list())
 
 		# output_mat shape: [output_feature_count, node_count]
 		# input_mat shape: [input_feature_count, node_count] 
