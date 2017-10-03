@@ -16,27 +16,23 @@ class GcnNet(object):
 			node_count = node_count, 
 			adj_mats = adj_mats,
 			input_feature_count = 1,
-			output_feature_count = 1,
+			output_feature_count = 2,
 			input_mat = input_mat,
-			is_input = True)
-
+			is_input = True,
+			activation = 'tanh')
 
 		layer1 = self.addLayer(layer)
-		# print(layer1.shape.as_list())
 
-		# layer1 = tf.nn.relu(layer1)
-		# need to add activation layer here
+		layer = GcnLayer(
+			node_count = node_count,
+			adj_mats = adj_mats,
+			input_feature_count = 2,
+			output_feature_count = 1,
+			input_mat = layer1.output,
+			is_input = False)
+		layer2 = self.addLayer(layer)
 
-		# layer = GcnLayer(
-		# 	node_count = node_count,
-		# 	adj_mats = adj_mats,
-		# 	input_feature_count = 2,
-		# 	output_feature_count = 1,
-		# 	input_mat = layer1,
-		# 	is_input = False)
-		# layer2 = self.addLayer(layer)
-
-		logits = tf.squeeze(layer1.output, axis = 1)
+		logits = tf.squeeze(layer2.output, axis = 1)
 		self.logits = tf.reduce_mean(logits)
 		return self.logits
 
