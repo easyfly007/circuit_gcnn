@@ -1,6 +1,8 @@
 import tensorflow as tf 
 import numpy as np 
 
+TOTAL_CONNECTION_TYPE = 9
+
 class GcnNet(object):
 	def __init__(self):
 		self.layers = []
@@ -78,7 +80,7 @@ class GcnLayer(object):
 		input_feature_count, 
 		output_feature_count = 1, 
 		input_mat = None,
-		connect_type_count = 12,
+		connect_type_count = 9,
 		is_input = True,
 		activation = 'None'):
 		''' 
@@ -129,7 +131,7 @@ class AttenLayer(GcnLayer):
 		adj_mats,
 		input_feature_count, 
 		input_mat,
-		connect_type_count = 12,
+		connect_type_count = TOTAL_CONNECTION_TYPE,
 		is_input = True,
 		):
 		super(AttenLayer, self).__init__(

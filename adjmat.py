@@ -1,9 +1,10 @@
 import numpy as np 
 from elemparser import getnodesparser
+from elemparser import connection_name2idx, connection_idx2name
 
 class AdjTypeMat(object):
 	def __init__(self):
-		self.connectionTypeCount = 12 # including self to self
+		self.connectionTypeCount = len(connection_idx2name) # including self to self
 
 	def readin(self, filename):
 		''' read in netlist file, with format:

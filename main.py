@@ -3,6 +3,7 @@ import tensorflow as tf
 from gcnn import GcnNet
 from util import get_inputs_data
 
+TOTAL_CONNECTION_TYPE = 9
 
 # 1. prepare the input data,
 features_train, labels_train = get_inputs_data('train')
@@ -10,10 +11,10 @@ features_train, labels_train = get_inputs_data('train')
 
 # 2. build the network
 # placeholder for one netlist input
-placeholder_adj_mats = tf.placeholder(tf.float32, [12, None])
-placeholder_node_count = tf.placeholder(tf.int32)
-placeholder_label = tf.placeholder(tf.float32)
-placeholder_learning_rate = tf.placeholder(tf.float32)
+placeholder_adj_mats = tf.placeholder(tf.float32, [TOTAL_CONNECTION_TYPE, None], name = 'adj_mat')
+placeholder_node_count = tf.placeholder(tf.int32, name = 'node_count')
+placeholder_label = tf.placeholder(tf.float32, name = 'label')
+placeholder_learning_rate = tf.placeholder(tf.float32, name = 'learning_rate')
 
 network = GcnNet()
 logits = network.buildNet(placeholder_node_count, placeholder_adj_mats)

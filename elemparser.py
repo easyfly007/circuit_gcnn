@@ -2,17 +2,14 @@ def buildConnectionMapping():
 	connection_idx2name = {}
 	connection_name2idx = {
 	'self': 0,
-	'md_mg': 1,
-	'md_ms': 2,
-	'mg_md': 3,
-	'mg_ms': 4,
-	'ms_md': 5,
-	'ms_mg': 6,
-	'r_r': 7,
-	'c_c': 8,
-	'l_l': 9,
-	'v_v':10,
-	'i_i':11}
+	'sd_g': 1,
+	'g_sd': 2,
+	'sd_sd': 3,
+	'r_r': 4,
+	'c_c': 5,
+	'l_l': 6,
+	'v_v':7,
+	'i_i':8}
 	for name, idx in connection_name2idx.items():
 		connection_idx2name[idx] = name
 	return connection_name2idx, connection_idx2name
@@ -43,12 +40,12 @@ class MosParser(Base):
 		d_idx = total_nodes.index(d)
 		g_idx = total_nodes.index(g)
 		s_idx = total_nodes.index(s)
-		mat[connection_name2idx['md_mg']][d_idx][g_idx] = 1
-		mat[connection_name2idx['md_ms']][d_idx][s_idx] = 1
-		mat[connection_name2idx['mg_md']][g_idx][d_idx] = 1
-		mat[connection_name2idx['mg_ms']][g_idx][s_idx] = 1
-		mat[connection_name2idx['ms_md']][s_idx][d_idx] = 1
-		mat[connection_name2idx['ms_mg']][s_idx][g_idx] = 1
+		mat[connection_name2idx['sd_g']][d_idx][g_idx] = 1
+		mat[connection_name2idx['sd_sd']][d_idx][s_idx] = 1
+		mat[connection_name2idx['g_sd']][g_idx][d_idx] = 1
+		mat[connection_name2idx['g_sd']][g_idx][s_idx] = 1
+		mat[connection_name2idx['sd_sd']][s_idx][d_idx] = 1
+		mat[connection_name2idx['sd_g']][s_idx][g_idx] = 1
 
 
 class ResParser(TwoNodesElem):
