@@ -117,7 +117,7 @@ class GcnLayer(object):
 		elif activation.lower() == 'sigmoid':
 			self.output = tf.sigmoid(self.output)
 		elif activation.lower() == 'softmax':
-			self.output = tf.nn.softmax(self.output)
+			self.output = tf.nn.softmax(self.output, dim = 0)
 		else:
 			pass
 
