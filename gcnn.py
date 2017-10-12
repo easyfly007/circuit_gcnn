@@ -44,7 +44,7 @@ class GcnNet(object):
 		layer4 = layer2.output * layer3.output
 		
 		logits = tf.squeeze(layer4, axis = 1)
-		self.logits = tf.reduce_mean(logits)
+		self.logits = tf.reduce_sum(logits)
 		return self.logits
 
 '''
