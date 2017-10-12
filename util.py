@@ -1,8 +1,10 @@
 import pickle
 import os
+import random
+
 from adjmat import AdjTypeMat
 
-def get_inputs_data(datatype):
+def get_inputs_data(datatype, shuffle = False, prefix = ''):
 	assert datatype in ['train', 'test', 'infer'], 'you must specify the data type, train or test'
 
 	if datatype in ['train', 'test'] and os.path.isfile(datatype + '_data.pkl'):
@@ -16,6 +18,7 @@ def get_inputs_data(datatype):
 		with open(datatype + '_caselist.txt', 'r') as f:
 			for file in f.readlines():
 				file = file.strip()
+				file = prefix + file
 				adj_obj.readin(file)
 				adj_mat, node_count = adj_obj.buildAdjTypeMat()
 				features.append((adj_mat, node_count))
@@ -37,8 +40,18 @@ def get_inputs_data(datatype):
 					f, pickle.HIGHEST_PROTOCOL)
 		elif datatype == 'infer':
 			labels = None
-			
+
+	if shuffle:
+		features, labels = shuffle_data(features, labels)
+
 	return features, labels
+
+
+def shuffle_data(data1, data2):
+	assert len(data1) == len(data2), 'feature/label not match'
+	combined = list(zip(data1, data2))
+	random.shuffle(combined)
+	return zip(*combined)
 
 
 if __name__ == '__main__':
