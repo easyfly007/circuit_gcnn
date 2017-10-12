@@ -79,10 +79,12 @@ def getnodesparser(elemname):
 	elif elemtype == 'r':
 		return ResParser()
 	elif elemtype == 'c':
-		return CapParser(connection_name2idx)
+		return CapParser()
 	elif elemtype == 'v':
 		return VsrcParser()
 	elif elemtype == 'i':
 		return IsrcParser()
 	else:
-		assert 0, 'element ' + elemname + ' currently not supported!'
+		print('warning: element',elemname + ' currently not supported!')
+		return None
+		# assert 0, 'element ' + elemname + ' currently not supported!'

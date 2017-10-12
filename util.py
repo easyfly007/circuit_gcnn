@@ -4,7 +4,7 @@ import random
 
 from adjmat import AdjTypeMat
 
-def get_inputs_data(datatype, shuffle = False, prefix = ''):
+def get_inputs_data(datatype, shuffle = False, listfile_prefix = '', casefile_prefix = ''):
 	assert datatype in ['train', 'test', 'infer'], 'you must specify the data type, train or test'
 
 	if datatype in ['train', 'test'] and os.path.isfile(datatype + '_data.pkl'):
@@ -15,17 +15,17 @@ def get_inputs_data(datatype, shuffle = False, prefix = ''):
 	else:
 		adj_obj = AdjTypeMat()
 		features = []
-		with open(datatype + '_caselist.txt', 'r') as f:
+		with open(listfile_prefix + datatype + '_caselist.txt', 'r') as f:
 			for file in f.readlines():
 				file = file.strip()
-				file = prefix + file
+				file = casefile_prefix + file
 				adj_obj.readin(file)
 				adj_mat, node_count = adj_obj.buildAdjTypeMat()
 				features.append((adj_mat, node_count))
 
 		if datatype in ['train', 'test']:
 			labels = []
-			with open(datatype + '_labellist.txt', 'r') as f:
+			with open(listfile_prefix + datatype + '_labellist.txt', 'r') as f:
 				for line in f.readlines():
 					line = line.strip()
 					if line == '1':
@@ -41,7 +41,7 @@ def get_inputs_data(datatype, shuffle = False, prefix = ''):
 		elif datatype == 'infer':
 			labels = None
 
-	if shuffle:
+	if shuffle and datatype in ['train', 'test']:
 		features, labels = shuffle_data(features, labels)
 
 	return features, labels

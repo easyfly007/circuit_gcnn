@@ -85,7 +85,8 @@ class AdjTypeMat(object):
 		'''
 		for elem, nodes in self.elem_nodes.items():
 			elem_node_parser = getnodesparser(elem)
-			elem_node_parser.updateMat(self.mat, self.nodes_list, nodes)
+			if elem_node_parser != None:
+				elem_node_parser.updateMat(self.mat, self.nodes_list, nodes)
 		
 		# return self.mat, nodes_count
 		return np.reshape(self.mat, (self.connectionTypeCount, nodes_count * nodes_count)), nodes_count
