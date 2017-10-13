@@ -13,7 +13,7 @@ features_train, labels_train = get_inputs_data('train',
 	listfile_prefix = '../circuit_classification_dataset/parsered_cases/', 
 	casefile_prefix = '../circuit_classification_dataset/parsered_cases/')
 
-features_train, labels_train = features_train[:5], labels_train[:5]
+# features_train, labels_train = features_train[:5], labels_train[:5]
 
 
 # 2. build the network
@@ -27,7 +27,7 @@ network = GcnNet()
 logits = network.buildNet(placeholder_node_count, placeholder_adj_mats)
 prob = tf.sigmoid(logits)
 
-cost = -placeholder_label * tf.log(prob) - (1.0- placeholder_label)*tf.log(1.0 - prob)
+cost = -placeholder_label * tf.log(prob + 1.0e-10) - (1.0- placeholder_label)*tf.log(1.0 - prob + 1.0e-10)
 pred = tf.case(
 	{tf.greater(prob, 0.5): lambda: tf.constant(1.0)}, 
 	default = lambda:tf.constant(0.0))
@@ -40,7 +40,7 @@ optimizer = tf.train.AdamOptimizer(learning_rate = placeholder_learning_rate).mi
 
 # 3. train
 # set super parameters
-epoches = 100
+epoches = 500
 learning_rate = 0.001
 epoch_print = 10
 verbose = True
