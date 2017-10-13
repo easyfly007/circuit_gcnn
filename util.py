@@ -4,10 +4,20 @@ import random
 
 from adjmat import AdjTypeMat
 
-def get_inputs_data(datatype, shuffle = False, listfile_prefix = '', casefile_prefix = ''):
+def get_inputs_data(datatype, shuffle = False, reload = True, listfile_prefix = '', casefile_prefix = ''):
+	'''
+	input variables
+		shuffle = True, do shuffle , shuffle = False, not do shuffle
+		reload = True: check pkl file, get from features/labels from pkl file
+		       = False: always rebuild from the netlist
+		listfile_prefix:
+				the prefix of file train_caselist.txt
+		casefile_prefix:
+				the prefix of case name in file train_caselist.txt
+	'''
 	assert datatype in ['train', 'test', 'infer'], 'you must specify the data type, train or test'
 
-	if datatype in ['train', 'test'] and os.path.isfile(datatype + '_data.pkl'):
+	if datatype in ['train', 'test'] and reload == True and os.path.isfile(datatype + '_data.pkl'):
 		with open(datatype + '_data.pkl', 'rb') as f:
 			pickle_data = pickle.load(f)
 			features, labels = pickle_data['features'], pickle_data['labels']

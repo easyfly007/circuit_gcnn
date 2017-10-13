@@ -9,12 +9,11 @@ TOTAL_CONNECTION_TYPE = 9
 
 # 1. prepare the input data,
 features_train, labels_train = get_inputs_data('train', 
-	shuffle = True, 
+	shuffle = True, reload = False,
 	listfile_prefix = '../circuit_classification_dataset/parsered_cases/', 
 	casefile_prefix = '../circuit_classification_dataset/parsered_cases/')
-# features_train, labels_train = get_inputs_data('train', 
-# 	shuffle = True)
 
+features_train, labels_train = features_train[:5], labels_train[:5]
 
 
 # 2. build the network
