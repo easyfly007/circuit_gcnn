@@ -11,7 +11,7 @@ class GcnNet(object):
 		self.layers.append(layer)
 		return self.layers[-1]
 
-	def buildNet(self, node_count, adj_mats):
+	def buildNet(self, node_count, adj_mats, keep_prob):
 		input_mat = tf.ones((node_count, 1))
 
 		layer = GcnLayer(
@@ -24,13 +24,14 @@ class GcnNet(object):
 			activation = 'tanh')
 
 		layer1 = self.addLayer(layer)
+		dropout1 = tf.nn.dropout(layer1.output, keep_prob)
 
 		layer = GcnLayer(
 			node_count = node_count,
 			adj_mats = adj_mats,
 			input_feature_count = 2,
 			output_feature_count = 1,
-			input_mat = layer1.output,
+			input_mat = dropout1,
 			is_input = False)
 		layer2 = self.addLayer(layer)
 

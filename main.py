@@ -13,6 +13,10 @@ features_train, labels_train = get_inputs_data('train',
 	listfile_prefix = '../circuit_classification_dataset/parsered_cases/', 
 	casefile_prefix = '../circuit_classification_dataset/parsered_cases/')
 
+idx = int(len(features_train) *0.8)
+features_test, labels_test  = features_train[idx:], labels_train[idx:]
+features_train, labels_train  = features_train[:idx], labels_train[:idx]
+
 # features_train, labels_train = features_train[:5], labels_train[:5]
 
 
@@ -22,9 +26,10 @@ placeholder_adj_mats = tf.placeholder(tf.float32, [TOTAL_CONNECTION_TYPE, None],
 placeholder_node_count = tf.placeholder(tf.int32, name = 'node_count')
 placeholder_label = tf.placeholder(tf.float32, name = 'label')
 placeholder_learning_rate = tf.placeholder(tf.float32, name = 'learning_rate')
+placeholder_keep_prob = tf.placeholder(tf.float32, name = 'keep_prob')
 
 network = GcnNet()
-logits = network.buildNet(placeholder_node_count, placeholder_adj_mats)
+logits = network.buildNet(placeholder_node_count, placeholder_adj_mats, placeholder_keep_prob)
 prob = tf.sigmoid(logits)
 
 cost = -placeholder_label * tf.log(prob + 1.0e-10) - (1.0- placeholder_label)*tf.log(1.0 - prob + 1.0e-10)
@@ -42,8 +47,8 @@ optimizer = tf.train.AdamOptimizer(learning_rate = placeholder_learning_rate).mi
 # set super parameters
 epoches = 500
 learning_rate = 0.001
-epoch_print = 10
-verbose = True
+epoch_print = 20
+verbose = False
 
 init = tf.global_variables_initializer()
 saver = tf.train.Saver()
@@ -59,7 +64,8 @@ with tf.Session() as sess:
 				placeholder_learning_rate: learning_rate,
 				placeholder_adj_mats: adj_mat, 
 				placeholder_node_count: node_count,
-				placeholder_label: label }
+				placeholder_label: label,
+				placeholder_keep_prob: 0.75 }
 			_, probability, accuracy = sess.run((optimizer, prob, accu), feed_dict = feed)
 			total_accuracy += accuracy
 			if verbose and epoch % epoch_print == 0:
@@ -77,7 +83,7 @@ with tf.Session() as sess:
 
 # 4. test
 print('testing begin')
-features_test, labels_test = get_inputs_data('test')
+# features_test, labels_test = get_inputs_data('test')
 with tf.Session() as sess:
 	saver.restore(sess, 'saved_models/gcn_model.ckpt')
 	print('reload model from \'saved_models/gcn_model.ckpt\'')
@@ -89,7 +95,8 @@ with tf.Session() as sess:
 		feed = {
 			placeholder_adj_mats: adj_mat, 
 			placeholder_node_count: node_count,
-			placeholder_label: label }
+			placeholder_label: label,
+			placeholder_keep_prob: 1.0}
 		probability, accuracy = sess.run((prob, accu), feed_dict = feed)
 		total_accuracy += accuracy
 		if verbose:
