@@ -4,6 +4,7 @@ import random
 
 from gcnn import GcnNet
 from util import get_inputs_data
+from util import shuffle_data
 
 TOTAL_CONNECTION_TYPE = 9
 
@@ -58,6 +59,7 @@ with tf.Session() as sess:
 	sess.run(init)
 	for epoch in range(1, epoches+1):
 		total_accuracy = 0.0
+		features_train, labels_train = shuffle_data(features_train, labels_train)
 		for sample_idx, (feature, label) in enumerate(zip(features_train, labels_train)):
 			adj_mat, node_count = feature
 			feed = {
