@@ -9,12 +9,16 @@ def buildConnectionMapping():
 	'c_c': 5,
 	'l_l': 6,
 	'v_v':7,
-	'i_i':8}
+	'i_i':8,
+	'd_d': 9}
 	for name, idx in connection_name2idx.items():
 		connection_idx2name[idx] = name
 	return connection_name2idx, connection_idx2name
 
 connection_name2idx, connection_idx2name = buildConnectionMapping()
+
+def get_total_connection_type():
+	return len(connection_name2idx)
 
 class Base(object):
 	pass
@@ -60,6 +64,12 @@ class CapParser(TwoNodesElem):
 		self.connection_idx = connection_name2idx['c_c']
 
 
+class InductorParser(TwoNodesElem):
+	def __init__(self):
+		self.elemtype = 'inductor'
+		self.connection_idx = connection_name2idx['l_l']
+
+
 class VsrcParser(TwoNodesElem):
 	def __init__(self):
 		self.elemtype = 'voltage source '
@@ -72,6 +82,12 @@ class IsrcParser(TwoNodesElem):
 		self.connection_idx = connection_name2idx['i_i']
 
 
+class DiodeParser(TwoNodesElem):
+	def __init__(self):
+		self.elemtype = 'diode'
+		self.connection_idx = connection_name2idx['d_d']
+
+
 def getnodesparser(elemname):
 	elemtype = elemname.split('.')[-1][0].lower()
 	if elemtype == 'm':
@@ -80,11 +96,15 @@ def getnodesparser(elemname):
 		return ResParser()
 	elif elemtype == 'c':
 		return CapParser()
+	elif elemtype == 'l':
+		return InductorParser()
 	elif elemtype == 'v':
 		return VsrcParser()
 	elif elemtype == 'i':
 		return IsrcParser()
+	elif elemtype == 'd':
+		return DiodeParser()
 	else:
-		print('warning: element',elemname + ' currently not supported!')
+		print('warning: element', elemname + 'elemtype =', elemtype, 'currently not supported!')
 		return None
 		# assert 0, 'element ' + elemname + ' currently not supported!'
