@@ -11,42 +11,53 @@ class GcnNet(object):
 		self.layers.append(layer)
 		return self.layers[-1]
 
-	def buildNet(self, node_count, adj_mats, keep_prob):
+	def buildNet(self, layer_list, node_count, adj_mats, keep_prob):
+		assert len(layer_list) >= 2, 'at least 2 layers (one for input, one for output)'
+		assert layer_list[0] == 1
+		assert layer_list[-1] == 1
+
+		# input layer
 		input_mat = tf.ones((node_count, 1))
 
-		layer = GcnLayer(
-			node_count = node_count, 
-			adj_mats = adj_mats,
-			input_feature_count = 1,
-			output_feature_count = 2,
-			input_mat = input_mat,
-			is_input = True,
-			activation = 'tanh')
+		last_layer = input_mat
+		last_output_count = 1
+		for layer_graph_count in layer_list[1:-1]:
+			print(layer_graph_count)
+			layer = GcnLayer(
+				node_count = node_count,
+				adj_mats = adj_mats,
+				input_feature_count = last_output_count,
+				output_feature_count = layer_graph_count,
+				input_mat = last_layer,
+				activation = 'tanh')
+			last_layer = self.addLayer(layer).output
+			last_output_count = layer_graph_count
 
-		layer1 = self.addLayer(layer)
-		dropout1 = tf.nn.dropout(layer1.output, keep_prob)
-
+		# output layer
 		layer = GcnLayer(
 			node_count = node_count,
 			adj_mats = adj_mats,
-			input_feature_count = 2,
+			input_feature_count = last_output_count,
 			output_feature_count = 1,
-			input_mat = dropout1,
-			is_input = False)
-		layer2 = self.addLayer(layer)
+			input_mat = last_layer,
+			activation = 'None')
+		output_layer = self.addLayer(layer).output
+		dropout_layer = tf.nn.dropout(output_layer, keep_prob)
 
+		# attention layer
 		layer = AttenLayer(
 			node_count = node_count, 
 			adj_mats = adj_mats, 
 			input_feature_count = 1,
-			input_mat = layer2.output)
-		layer3 = self.addLayer(layer)
+			input_mat = output_layer)
+		atten_layer = self.addLayer(layer).output
 
-		layer4 = layer2.output * layer3.output
-		
-		logits = tf.squeeze(layer4, axis = 1)
+		# logits layer
+		logit_layer = dropout_layer * atten_layer
+		logits = tf.squeeze(logit_layer, axis = 1)
 		self.logits = tf.reduce_sum(logits)
 		return self.logits
+
 
 '''
 graph convolutional operation:
@@ -82,7 +93,6 @@ class GcnLayer(object):
 		output_feature_count = 1, 
 		input_mat = None,
 		connect_type_count = 9,
-		is_input = True,
 		activation = 'None'):
 		''' 
 		output = Weights * input_mat * adj_mat * connect_type_mat
@@ -96,9 +106,6 @@ class GcnLayer(object):
 		[output_feature_count, node_count]
 		'''
 
-		if is_input:
-			assert input_feature_count == 1, 'input should have feature count 1'
-		
 		self.weights = tf.Variable(tf.truncated_normal(
 			[input_feature_count *connect_type_count, output_feature_count]))
 		self.input_mat = input_mat
@@ -133,7 +140,6 @@ class AttenLayer(GcnLayer):
 		input_feature_count, 
 		input_mat,
 		connect_type_count = TOTAL_CONNECTION_TYPE,
-		is_input = True,
 		):
 		super(AttenLayer, self).__init__(
 			node_count = node_count,

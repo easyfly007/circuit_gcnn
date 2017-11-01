@@ -9,14 +9,14 @@ from util import shuffle_data
 TOTAL_CONNECTION_TYPE = 9
 
 # 1. prepare the input data,
-features_train, labels_train = get_inputs_data('train', 
+features_total, labels_total = get_inputs_data('train', 
 	shuffle = True, reload = False,
 	listfile_prefix = '../circuit_classification_dataset/parsered_cases/', 
 	casefile_prefix = '../circuit_classification_dataset/parsered_cases/')
 
-idx = int(len(features_train) *0.8)
-features_test, labels_test  = features_train[idx:], labels_train[idx:]
-features_train, labels_train  = features_train[:idx], labels_train[:idx]
+idx = int(len(features_total) *0.8)
+features_test, labels_test  = features_total[idx:], labels_total[idx:]
+features_train, labels_train  = features_total[:idx], labels_total[:idx]
 
 # features_train, labels_train = features_train[:5], labels_train[:5]
 
@@ -29,8 +29,9 @@ placeholder_label = tf.placeholder(tf.float32, name = 'label')
 placeholder_learning_rate = tf.placeholder(tf.float32, name = 'learning_rate')
 placeholder_keep_prob = tf.placeholder(tf.float32, name = 'keep_prob')
 
+layer_list = [1,2, 1]
 network = GcnNet()
-logits = network.buildNet(placeholder_node_count, placeholder_adj_mats, placeholder_keep_prob)
+logits = network.buildNet(layer_list, placeholder_node_count, placeholder_adj_mats, placeholder_keep_prob)
 prob = tf.sigmoid(logits)
 
 cost = -placeholder_label * tf.log(prob + 1.0e-10) - (1.0- placeholder_label)*tf.log(1.0 - prob + 1.0e-10)
@@ -109,24 +110,25 @@ with tf.Session() as sess:
 	print('total test accuracy is:', total_accuracy)
 
 
-#5 inference, which means no label provided
-print('inference begin...')
-label_file = 'infer_labellist.txt'
-features_infer, _ = get_inputs_data('infer')
+# #5 inference, which means no label provided
+# print('inference begin...')
+# label_file = 'infer_labellist.txt'
+# features_infer, _ = get_inputs_data('infer')
 
-with open(label_file, 'w') as f:
-	with tf.Session() as sess:
-		saver.restore(sess, 'saved_models/gcn_model.ckpt')
-		print('reload model from \'saved_models/gcn_model.ckpt\'')
+# with open(label_file, 'w') as f:
+# 	with tf.Session() as sess:
+# 		saver.restore(sess, 'saved_models/gcn_model.ckpt')
+# 		print('reload model from \'saved_models/gcn_model.ckpt\'')
 
-		total_accuracy = 0.0
-		for sample_idx, feature in enumerate(features_infer):
-			adj_mat, node_count = feature
+# 		total_accuracy = 0.0
+# 		for sample_idx, feature in enumerate(features_infer):
+# 			adj_mat, node_count = feature
 
-			feed = {
-				placeholder_adj_mats: adj_mat, 
-				placeholder_node_count: node_count}
-			predicted = sess.run((pred), feed_dict = feed)
-			if verbose:
-				print('\n\tinference sample:', sample_idx, 'predicted:', predicted)
-			f.write(str(predicted) + '\n')
+# 			feed = {
+# 				placeholder_adj_mats: adj_mat, 
+# 				placeholder_node_count: node_count,
+# 				placeholder_keep_prob: 1.0}
+# 			predicted = sess.run((pred), feed_dict = feed)
+# 			if verbose:
+# 				print('\n\tinference sample:', sample_idx, 'predicted:', predicted)
+# 			f.write(str(predicted) + '\n')
