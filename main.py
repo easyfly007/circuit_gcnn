@@ -18,8 +18,6 @@ idx = int(len(features_total) *0.8)
 features_test, labels_test  = features_total[idx:], labels_total[idx:]
 features_train, labels_train  = features_total[:idx], labels_total[:idx]
 
-# features_train, labels_train = features_train[:5], labels_train[:5]
-
 
 # 2. build the network
 # placeholder for one netlist input
@@ -29,9 +27,11 @@ placeholder_label = tf.placeholder(tf.float32, name = 'label')
 placeholder_learning_rate = tf.placeholder(tf.float32, name = 'learning_rate')
 placeholder_keep_prob = tf.placeholder(tf.float32, name = 'keep_prob')
 
-layer_list = [1,2, 1]
+layer_list = [1, 3, 1]
+atten_layer_flag = True
+keep_prob = 1.0
 network = GcnNet()
-logits = network.buildNet(layer_list, placeholder_node_count, placeholder_adj_mats, placeholder_keep_prob)
+logits = network.buildNet(layer_list, placeholder_node_count, placeholder_adj_mats, placeholder_keep_prob, atten_layer_flag)
 prob = tf.sigmoid(logits)
 
 cost = -placeholder_label * tf.log(prob + 1.0e-10) - (1.0- placeholder_label)*tf.log(1.0 - prob + 1.0e-10)
@@ -47,7 +47,7 @@ optimizer = tf.train.AdamOptimizer(learning_rate = placeholder_learning_rate).mi
 
 # 3. train
 # set super parameters
-epoches = 500
+epoches = 400
 learning_rate = 0.001
 epoch_print = 20
 verbose = False
@@ -68,7 +68,7 @@ with tf.Session() as sess:
 				placeholder_adj_mats: adj_mat, 
 				placeholder_node_count: node_count,
 				placeholder_label: label,
-				placeholder_keep_prob: 0.75 }
+				placeholder_keep_prob: keep_prob}
 			_, probability, accuracy = sess.run((optimizer, prob, accu), feed_dict = feed)
 			total_accuracy += accuracy
 			if verbose and epoch % epoch_print == 0:
