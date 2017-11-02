@@ -11,7 +11,7 @@ class GcnNet(object):
 		self.layers.append(layer)
 		return self.layers[-1]
 
-	def buildNet(self, layer_list, node_count, adj_mats, keep_prob, atten_layer_flag = True):
+	def buildNet(self, layer_list, node_count, adj_mats, keep_prob, atten_layer_flag = True, activation = 'tanh'):
 		assert len(layer_list) >= 2, 'at least 2 layers (one for input, one for output)'
 		assert layer_list[0] == 1
 		assert layer_list[-1] == 1
@@ -22,14 +22,13 @@ class GcnNet(object):
 		last_layer = input_mat
 		last_output_count = 1
 		for layer_graph_count in layer_list[1:-1]:
-			print(layer_graph_count)
 			layer = GcnLayer(
 				node_count = node_count,
 				adj_mats = adj_mats,
 				input_feature_count = last_output_count,
 				output_feature_count = layer_graph_count,
 				input_mat = last_layer,
-				activation = 'tanh')
+				activation = activation)
 			last_layer = self.addLayer(layer).output
 			last_output_count = layer_graph_count
 
@@ -57,7 +56,7 @@ class GcnNet(object):
 			logit_layer = dropout_layer * atten_layer
 		else:
 			logit_layer = dropout_layer
-			
+
 		logits = tf.squeeze(logit_layer, axis = 1)
 		self.logits = tf.reduce_sum(logits)
 		return self.logits
