@@ -111,6 +111,7 @@ class GcnLayer(object):
 
 		self.weights = tf.Variable(tf.truncated_normal(
 			[input_feature_count *connect_type_count, output_feature_count]))
+		self.bias = tf.Variable(tf.zeros([output_feature_count]))
 		self.input_mat = input_mat
 		
 		self.adj_mats = []
@@ -120,7 +121,7 @@ class GcnLayer(object):
 			self.adj_mats.append(a)
 		self.prepare_mat = tf.concat(self.adj_mats, axis = 1)
 
-		self.output = tf.matmul(self.prepare_mat, self.weights)
+		self.output = tf.matmul(self.prepare_mat, self.weights) + self.bias
 		if activation.lower() == 'relu':
 			self.output = tf.nn.relu(self.output)
 		elif activation.lower() == 'tanh':
