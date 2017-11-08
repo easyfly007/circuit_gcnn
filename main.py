@@ -145,7 +145,7 @@ if __name__ == '__main__':
 			for atten_layer_flag in [True, False]:
 				for keep_prob in [1.0, 0.75, 0.5]:
 					for activation in ['sigmoid', 'tanh', 'relu']:
-						string = 'layer list=' + str(layer_list) + ', atten = ' + str(atten_layer_flag) + ', keep_prob = ' + str(keep_prob)
+						string = 'layer list=' + str(layer_list) + ', atten = ' + str(atten_layer_flag) + ', keep_prob = ' + str(keep_prob) + activation
 						print(string)
 						f.write('\n\n '+ string)
 						for i in range(6):
